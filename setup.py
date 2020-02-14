@@ -37,7 +37,7 @@ DESCRIPTION = "Python package for converting images to zarr chunked arrays."
 LONG_DESCRIPTION = read("README.md")
 LONG_DESCRIPTION_CONTENT_TYPE = "text/markdown"
 NAME = "img2zarr"
-PACKAGES = find_packages(include=[NAME, f"{NAME}.*"])
+PACKAGES = find_packages(include=["img2zarr", "img2zarr.*"])
 AUTHOR = "Heath Patterson / Trevor Manz"
 AUTHOR_EMAIL = "trevor.j.manz@gmail.com"
 URL = "https://img2zarr.readthedocs.io."
