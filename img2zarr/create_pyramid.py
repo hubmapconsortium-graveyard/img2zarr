@@ -1,3 +1,5 @@
+import click
+
 import numpy as np
 import dask.array as da
 import zarr
@@ -14,7 +16,7 @@ def pad_axis(array, dim, pad_width):
     return padded
 
 
-def tile_zarr(
+def _create_pyramid(
     base_image_path,
     max_level=None,
     dtype=None,
@@ -75,3 +77,28 @@ def tile_zarr(
         # Read from last store so dask doesn't need to re-compute
         # task graph starting at base.
         img = da.from_zarr(out_path)
+
+
+@click.command()
+@click.argument(
+    "base", type=click.Path(),
+)
+@click.option(
+    "--max_level",
+    help="Number of pyramidal layers to create.",
+    type=int,
+    default=None,
+)
+@click.option(
+    "--tile_size",
+    help="""
+    Default is 512. If different from full resolution
+    chunk sizes, a new full resolution array will be
+    created with desired tile size.""",
+    type=int,
+    default=512,
+)
+def create_pyramid(base, max_level, tile_size):
+    _create_pyramid(
+        base_image_path=base, max_level=max_level, tile_size=tile_size
+    )
