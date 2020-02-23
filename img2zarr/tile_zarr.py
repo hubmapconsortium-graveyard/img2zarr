@@ -25,6 +25,8 @@ def tile_zarr(
 ):
     z = zarr.open(base_image_path)
     pyramid_path = Path(base_image_path).parent
+    root = zarr.open_group(str(pyramid_path), mode="a")
+    root.create_group(pyramid_group, overwrite=True)
 
     img = da.from_zarr(z)
     y_size, x_size = img.shape[-2:]
