@@ -17,6 +17,16 @@ def pad_axis(array, dim, pad_width):
     return padded
 
 
+def guess_rgb(shape):
+    ndim = len(shape)
+    last_dim = shape[-1]
+
+    if ndim > 2 and last_dim < 5:
+        return True
+    else:
+        return False
+
+
 def _create_pyramid(
     base_image_path, max_level=None, compressor=None,
 ):
@@ -26,9 +36,17 @@ def _create_pyramid(
 
     # Gather metadata about store
     z = zarr.open(base_image_path)
-    y_size, x_size = z.shape[-2:]
-    y_dim = len(z.shape) - 2
-    x_dim = len(z.shape) - 1
+    is_rgb = guess_rgb(z.shape)
+    if is_rgb:
+        # Assume last three dims are YXC
+        y_size, x_size, _ = z.shape[-3:]
+        y_dim = len(z.shape) - 3
+        x_dim = len(z.shape) - 2
+    else:
+        # Assume last two dims are YX
+        y_size, x_size = z.shape[-2:]
+        y_dim = len(z.shape) - 2
+        x_dim = len(z.shape) - 1
     tile_size = z.chunks[x_dim]
     chunks = z.chunks
     dtype = z.dtype
@@ -81,7 +99,5 @@ def _create_pyramid(
     "--n_layers", help="Number of pyramidal layers to create.", type=int, default=None,
 )
 def create_pyramid(base, n_layers):
-    max_level = None
-    if n_layers is not None:
-        max_level = n_layers + 1
+    max_level = n_layers + 1 if n_layers else None
     _create_pyramid(base_image_path=base, max_level=max_level)
