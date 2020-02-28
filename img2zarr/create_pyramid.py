@@ -36,6 +36,7 @@ def _create_pyramid(
 
     # Gather metadata about store
     z = zarr.open(base_image_path)
+
     is_rgb = guess_rgb(z.shape)
     if is_rgb:
         # Assume last three dims are YXC
@@ -47,6 +48,9 @@ def _create_pyramid(
         y_size, x_size = z.shape[-2:]
         y_dim = len(z.shape) - 2
         x_dim = len(z.shape) - 1
+
+    # For now we are going to respect initial chunking to
+    # determine pyramidal chuck sizes.
     tile_size = z.chunks[x_dim]
     chunks = z.chunks
     dtype = z.dtype
